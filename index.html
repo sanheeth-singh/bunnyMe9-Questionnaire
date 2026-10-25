@@ -1,0 +1,589 @@
+
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="Web development services for business websites, portfolios, e-commerce, and custom web applications.">
+  <meta name="theme-color" content="#120905">
+  <title>bunnyMe9 | Premium Web Development</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome for Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Font: Plus Jakarta Sans -->
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            clayBase: '#FFE3B3',
+            clayBaseDark: '#f5d49e',
+            accentDark: '#120905',
+            accentOrange: '#EA6113',
+            accentAmber: '#F88F22',
+            accentYellow: '#FBB931',
+            textDark: '#21120B'
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          },
+          boxShadow: {
+            'clay-card': '12px 12px 24px #e0c297, -12px -12px 24px #ffffff',
+            'clay-card-sm': '6px 6px 14px #e0c297, -6px -6px 14px #ffffff',
+            'clay-card-dark': '12px 12px 28px #090402, -8px -8px 20px #20110a',
+            'clay-pressed': 'inset 5px 5px 10px #e0c297, inset -5px -5px 10px #ffffff',
+            'clay-btn': '6px 6px 16px #c44f0d, -4px -4px 12px #ff7319',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      background-color: #120905;
+      color: #21120B;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      margin: 0;
+      min-width: 0;
+    }
+
+    img, svg, video, canvas { max-width: 100%; }
+    input, textarea, select, button { font: inherit; }
+
+    button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible {
+      outline: 3px solid #FBB931;
+      outline-offset: 3px;
+    }
+
+    /* Claymorphic Utility Shapes */
+    .clay-surface {
+      background: #FFE3B3;
+      box-shadow: 14px 14px 30px #080402, -4px -4px 16px rgba(255, 227, 179, 0.1);
+      border-radius: 32px;
+    }
+
+    .clay-card-light {
+      background: #FFE3B3;
+      box-shadow: 10px 10px 20px #e2c59a, -10px -10px 20px #fefae2;
+      border-radius: 24px;
+    }
+
+    .clay-card-inset {
+      background: #f8dbab;
+      box-shadow: inset 4px 4px 8px #d9be94, inset -4px -4px 8px #ffffff;
+      border-radius: 16px;
+    }
+
+    .clay-pill {
+      background: #FFE3B3;
+      box-shadow: 4px 4px 10px #e2c59a, -4px -4px 10px #ffffff;
+      border-radius: 999px;
+    }
+
+    .btn-clay-orange {
+      background: linear-gradient(135deg, #EA6113, #F88F22);
+      color: #FFFFFF;
+      box-shadow: 6px 6px 16px rgba(234, 97, 19, 0.4), -3px -3px 8px rgba(255, 255, 255, 0.2);
+      border-radius: 999px;
+      transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .btn-clay-orange:active {
+      transform: scale(0.96);
+      box-shadow: inset 3px 3px 6px #b84708, inset -3px -3px 6px #ff8930;
+    }
+
+    @keyframes floatSlow {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .animate-float { animation: floatSlow 4s ease-in-out infinite; }
+
+    .form-step {
+      display: none;
+      opacity: 0;
+      transition: opacity 0.3s ease-in-out;
+    }
+
+    .form-step.active {
+      display: block;
+      opacity: 1;
+    }
+
+    /* CENTRALIZED TOAST FOR MOBILE & DESKTOP */
+    #toast-notification {
+      position: fixed;
+      top: calc(env(safe-area-inset-top, 0px) + 1rem);
+      left: 50%;
+      transform: translate(-50%, calc(-100% - 2rem));
+      width: calc(100% - 2rem);
+      max-width: 28rem;
+      z-index: 1000;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      overflow-wrap: anywhere;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: transform 0.28s ease, opacity 0.2s ease, visibility 0.2s ease;
+    }
+    #toast-notification.show {
+      transform: translate(-50%, 0);
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+    #toast-message { flex: 1 1 auto; min-width: 0; }
+  </style>
+</head>
+<body class="min-h-screen pb-12">
+
+  <!-- IN-UI TOAST MESSAGE CONTAINER -->
+  <div id="toast-notification" class="px-5 py-4 rounded-2xl bg-accentDark text-clayBase border-2 border-accentAmber shadow-2xl" role="status">
+    <div id="toast-icon" class="text-accentYellow text-xl">
+      <i class="fa-solid fa-circle-info"></i>
+    </div>
+    <div id="toast-message" class="text-sm font-semibold">Notification message</div>
+    <button type="button" onclick="hideToast()" class="text-clayBase/70 hover:text-white p-1 rounded-full" aria-label="Dismiss">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+  </div>
+
+  <!-- MAIN CONTAINER -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+
+    <!-- HEADER / NAVBAR -->
+    <header class="flex justify-between items-center mb-8 px-2">
+      <div class="flex items-center gap-3">
+        <div class="w-12 h-12 clay-pill flex items-center justify-center text-accentDark font-black text-xl">
+          b9
+        </div>
+        <span class="text-2xl font-extrabold tracking-tight text-clayBase">
+          bunny<span class="text-accentOrange">Me9</span>
+        </span>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <a href="#questionnaire" class="px-5 py-2.5 btn-clay-orange font-bold text-xs uppercase tracking-wider">
+          Start Project
+        </a>
+      </div>
+    </header>
+
+    <!-- HERO SECTION -->
+    <section class="relative w-full clay-surface p-6 sm:p-10 lg:p-14 overflow-hidden mb-16">
+      <div class="absolute inset-0 z-0 opacity-15 pointer-events-none" 
+           style="background: url('assets/background.jpg') center/cover no-repeat;"></div>
+
+      <div class="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+        
+        <!-- LEFT COLUMN -->
+        <div class="lg:col-span-6 space-y-6">
+          <div class="inline-flex items-center gap-2 px-4 py-1.5 clay-card-inset text-xs font-bold text-accentDark uppercase tracking-wider">
+            <i class="fa-solid fa-code text-accentOrange"></i>
+            Sanheeth Singh • Web Developer
+          </div>
+
+          <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black text-accentDark leading-tight tracking-tight">
+            Build Modern <br>
+            <span class="text-accentOrange">Websites.</span>
+          </h1>
+
+          <p class="text-textDark/80 font-medium text-base sm:text-lg max-w-md">
+            We transform ideas into high-converting, lightning-fast digital experiences. Mobile-first, sleek, and built to scale.
+          </p>
+
+          <div class="flex flex-wrap items-center gap-4 pt-2">
+            <a href="#questionnaire" class="px-8 py-4 btn-clay-orange font-extrabold text-sm sm:text-base tracking-wide flex items-center gap-3">
+              <span>GET STARTED</span>
+              <i class="fa-solid fa-arrow-right-long"></i>
+            </a>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4 pt-4 max-w-sm">
+            <div class="clay-card-light p-4 text-center">
+              <div class="text-xl sm:text-2xl font-black text-accentOrange">Custom</div>
+              <div class="text-xs font-bold text-textDark/70 uppercase">Tailored Solutions</div>
+            </div>
+            <div class="clay-card-light p-4 text-center">
+              <div class="text-xl sm:text-2xl font-black text-accentDark">Direct</div>
+              <div class="text-xs font-bold text-textDark/70 uppercase">1-on-1 Communication</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CENTER OVERLAY AVATAR -->
+        <div class="lg:col-span-3 flex justify-center items-center my-4 lg:my-0 relative">
+          <div class="absolute w-64 h-64 sm:w-80 sm:h-80 rounded-full bg-gradient-to-br from-accentAmber to-accentOrange opacity-30 filter blur-xl animate-pulse"></div>
+          
+          <img src="assets/avatar.png" 
+               onerror="this.onerror=null; this.src='https://placehold.co/400x500/120905/FFE3B3?text=Sanheeth+Singh';" 
+               alt="Sanheeth Singh - bunnyMe9" 
+               class="relative z-10 w-64 sm:w-80 lg:w-full object-contain filter drop-shadow-2xl animate-float">
+        </div>
+
+        <!-- RIGHT COLUMN -->
+        <div class="lg:col-span-3 flex flex-col justify-end space-y-4">
+          <div class="clay-card-light p-6 space-y-4 border-2 border-white/40">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-full bg-accentDark text-clayBase flex items-center justify-center font-bold text-sm">
+                SS
+              </div>
+              <div>
+                <h4 class="font-bold text-sm text-accentDark">Sanheeth Singh</h4>
+                <p class="text-xs text-textDark/70 font-semibold">Founder & Lead Dev</p>
+              </div>
+            </div>
+
+            <p class="text-xs sm:text-sm italic font-semibold text-accentDark leading-relaxed">
+              "I create premium websites that look clean, perform seamlessly across all mobile devices, and convert visitors into clients."
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- SECTION D: OUR WORKING PROCESS -->
+    <section class="max-w-5xl mx-auto mb-20">
+      <div class="text-center mb-10 space-y-2">
+        <span class="px-4 py-1.5 clay-pill text-xs font-black text-accentOrange uppercase tracking-wider">HOW WE WORK</span>
+        <h2 class="text-3xl sm:text-4xl font-black text-clayBase">Our Working Process</h2>
+        <p class="text-clayBase/70 text-sm max-w-lg mx-auto font-medium">Clear, structured, and transparent from day one.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+        <div class="clay-surface p-5 text-center flex flex-col items-center justify-start space-y-3">
+          <div class="w-10 h-10 rounded-full bg-accentOrange text-white flex items-center justify-center font-black text-sm">1</div>
+          <h3 class="font-black text-sm text-accentDark">Discovery</h3>
+          <p class="text-xs text-textDark/70">Submit questionnaire with details and requirements.</p>
+        </div>
+
+        <div class="clay-surface p-5 text-center flex flex-col items-center justify-start space-y-3">
+          <div class="w-10 h-10 rounded-full bg-accentOrange text-white flex items-center justify-center font-black text-sm">2</div>
+          <h3 class="font-black text-sm text-accentDark">Proposal</h3>
+          <p class="text-xs text-textDark/70">Receive scope breakdown, timeline, and quote.</p>
+        </div>
+
+        <div class="clay-surface p-5 text-center flex flex-col items-center justify-start space-y-3">
+          <div class="w-10 h-10 rounded-full bg-accentOrange text-white flex items-center justify-center font-black text-sm">3</div>
+          <h3 class="font-black text-sm text-accentDark">Build</h3>
+          <p class="text-xs text-textDark/70">Custom design & mobile-responsive coding.</p>
+        </div>
+
+        <div class="clay-surface p-5 text-center flex flex-col items-center justify-start space-y-3">
+          <div class="w-10 h-10 rounded-full bg-accentOrange text-white flex items-center justify-center font-black text-sm">4</div>
+          <h3 class="font-black text-sm text-accentDark">Review</h3>
+          <p class="text-xs text-textDark/70">Test on real devices & gather client feedback.</p>
+        </div>
+
+        <div class="clay-surface p-5 text-center flex flex-col items-center justify-start space-y-3">
+          <div class="w-10 h-10 rounded-full bg-accentOrange text-white flex items-center justify-center font-black text-sm">5</div>
+          <h3 class="font-black text-sm text-accentDark">Launch</h3>
+          <p class="text-xs text-textDark/70">Deploy live, connect domain, and hand over access.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- QUESTIONNAIRE SECTION -->
+    <section id="questionnaire" class="max-w-3xl mx-auto mb-20">
+      <div class="text-center mb-8 space-y-2">
+        <span class="px-4 py-1.5 clay-pill text-xs font-black text-accentOrange uppercase tracking-wider">PROJECT DISCOVERY</span>
+        <h2 class="text-3xl sm:text-4xl font-black text-clayBase">Web Development Questionnaire</h2>
+        <p class="text-clayBase/70 text-sm max-w-lg mx-auto font-medium">Fill out this simple 3-step brief to give us an overview of your web project needs.</p>
+      </div>
+
+      <div class="clay-surface p-6 sm:p-10 border-4 border-clayBaseDark/30">
+        <div class="mb-8 space-y-3">
+          <div class="flex flex-wrap gap-x-3 gap-y-1 justify-between items-start text-xs font-extrabold text-accentDark">
+            <span id="progress-text-step">STEP 1 OF 3</span>
+            <span id="progress-text-title" class="text-accentOrange uppercase">BASIC DETAILS & PROJECT TYPE</span>
+          </div>
+          <div class="w-full h-3 clay-card-inset p-0.5 overflow-hidden">
+            <div id="progress-bar-fill" class="h-full bg-gradient-to-r from-accentOrange to-accentYellow rounded-full transition-all duration-500 w-1/3"></div>
+          </div>
+        </div>
+
+        <form id="generalProjectForm" onsubmit="handleFormSubmit(event)">
+          <!-- STEP 1 -->
+          <div class="form-step active" id="step-1">
+            <div class="space-y-5">
+              <div>
+                <label for="clientName" class="block text-xs font-extrabold uppercase text-accentDark mb-2">Client / Business Name <span class="text-accentOrange">*</span></label>
+                <input type="text" id="clientName" required class="w-full p-4 clay-card-inset text-accentDark font-semibold text-sm outline-none" placeholder="e.g. Acme Corp or Personal Brand">
+              </div>
+
+              <div>
+                <label for="contactPerson" class="block text-xs font-extrabold uppercase text-accentDark mb-2">Contact Person & Role <span class="text-accentOrange">*</span></label>
+                <input type="text" id="contactPerson" required class="w-full p-4 clay-card-inset text-accentDark font-semibold text-sm outline-none" placeholder="e.g. Alex Morgan (Founder / Manager)">
+              </div>
+
+              <div>
+                <label for="contactDetails" class="block text-xs font-extrabold uppercase text-accentDark mb-2">WhatsApp or Email <span class="text-accentOrange">*</span></label>
+                <input type="text" id="contactDetails" required class="w-full p-4 clay-card-inset text-accentDark font-semibold text-sm outline-none" placeholder="e.g. +91 98765 43210 or email@domain.com">
+              </div>
+
+              <div>
+                <label for="projectType" class="block text-xs font-extrabold uppercase text-accentDark mb-2">Project Category <span class="text-accentOrange">*</span></label>
+                <select id="projectType" required class="w-full p-4 clay-card-inset text-accentDark font-semibold text-sm bg-clayBase">
+                  <option value="" disabled selected>Select category...</option>
+                  <option value="Business / Corporate Website">Business / Corporate Website</option>
+                  <option value="School / Educational Institution">School / Educational Institution</option>
+                  <option value="E-Commerce Store">E-Commerce Store</option>
+                  <option value="Personal Portfolio">Personal Portfolio</option>
+                  <option value="Custom Web Application">Custom Web Application</option>
+                  <option value="Website Redesign">Website Redesign</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="mt-8">
+              <button type="button" onclick="goToStep(2)" class="w-full py-4 btn-clay-orange font-extrabold text-sm uppercase tracking-wider flex items-center justify-center gap-2">
+                <span>Next: Features & Scope</span>
+                <i class="fa-solid fa-chevron-right"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- STEP 2 -->
+          <div class="form-step" id="step-2">
+            <div class="space-y-5">
+              <div>
+                <label for="pageCount" class="block text-xs font-extrabold uppercase text-accentDark mb-2">Estimated Pages</label>
+                <input type="text" id="pageCount" class="w-full p-4 clay-card-inset text-accentDark font-semibold text-sm outline-none" placeholder="e.g. 1 Page Landing, 5 Pages">
+              </div>
+
+              <div>
+                <label for="requiredFeatures" class="block text-xs font-extrabold uppercase text-accentDark mb-2">Key Features Needed</label>
+                <textarea id="requiredFeatures" rows="3" class="w-full p-4 clay-card-inset text-accentDark font-semibold text-sm outline-none" placeholder="e.g. Contact form, Payment gateway, Gallery, Student portal..."></textarea>
+              </div>
+
+              <div>
+                <label for="contentReady" class="block text-xs font-extrabold uppercase text-accentDark mb-2">Is content ready?</label>
+                <select id="contentReady" class="w-full p-4 clay-card-inset text-accentDark font-semibold text-sm bg-clayBase">
+                  <option value="Ready">Yes, content & logo ready</option>
+                  <option value="In Progress">In progress / Need help</option>
+                  <option value="Need Copywriting">Need bunnyMe9 to create content</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="mt-8 flex gap-4">
+              <button type="button" onclick="goToStep(1)" class="w-1/3 py-4 clay-card-light text-accentDark font-extrabold text-xs uppercase">Back</button>
+              <button type="button" onclick="goToStep(3)" class="w-2/3 py-4 btn-clay-orange font-extrabold text-sm uppercase tracking-wider flex items-center justify-center gap-2">
+                <span>Next: Style & Budget</span>
+                <i class="fa-solid fa-chevron-right"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- STEP 3 -->
+          <div class="form-step" id="step-3">
+            <div class="space-y-5">
+              <div>
+                <label for="designPreferences" class="block text-xs font-extrabold uppercase text-accentDark mb-2">Visual Style Preferences</label>
+                <input type="text" id="designPreferences" class="w-full p-4 clay-card-inset text-accentDark font-semibold text-sm outline-none" placeholder="e.g. Bright & Warm, Dark Minimalist, Corporate Navy Blue">
+              </div>
+
+              <div>
+                <label for="referenceSites" class="block text-xs font-extrabold uppercase text-accentDark mb-2">Inspiration Websites</label>
+                <input type="text" id="referenceSites" class="w-full p-4 clay-card-inset text-accentDark font-semibold text-sm outline-none" placeholder="Links to websites you like">
+              </div>
+
+              <div>
+                <label for="budgetRange" class="block text-xs font-extrabold uppercase text-accentDark mb-2">Estimated Budget</label>
+                <select id="budgetRange" class="w-full p-4 clay-card-inset text-accentDark font-semibold text-sm bg-clayBase">
+                  <option value="Not decided yet" selected>Not decided yet</option>
+                  <option value="Under ₹10,000">Under ₹10,000</option>
+                  <option value="₹10,000–₹25,000">₹10,000–₹25,000</option>
+                  <option value="₹25,000–₹50,000">₹25,000–₹50,000</option>
+                  <option value="₹50,000+">₹50,000+</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="mt-8 flex gap-4">
+              <button type="button" onclick="goToStep(2)" class="w-1/3 py-4 clay-card-light text-accentDark font-extrabold text-xs uppercase">Back</button>
+              <button type="submit" id="submitBtn" class="w-2/3 py-4 btn-clay-orange font-extrabold text-sm uppercase tracking-wider flex items-center justify-center gap-2">
+                <i class="fa-solid fa-paper-plane"></i>
+                <span>Submit Questionnaire</span>
+              </button>
+            </div>
+          </div>
+        </form>
+
+        <p class="mt-5 text-xs leading-relaxed text-accentDark/75">
+          By submitting, you agree that your contact and project details may be used to respond to this enquiry. Please do not include passwords, payment details, or other sensitive information.
+        </p>
+      </div>
+    </section>
+
+    <!-- SECTION E: FAQ SECTION -->
+    <section class="max-w-3xl mx-auto mb-16">
+      <div class="text-center mb-8 space-y-2">
+        <span class="px-4 py-1.5 clay-pill text-xs font-black text-accentOrange uppercase tracking-wider">GOT QUESTIONS?</span>
+        <h2 class="text-3xl sm:text-4xl font-black text-clayBase">Frequently Asked Questions</h2>
+      </div>
+
+      <div class="space-y-4">
+        <details class="clay-surface p-5 text-accentDark cursor-pointer group">
+          <summary class="font-bold text-sm flex justify-between items-center">
+            <span>How much does a typical website cost?</span>
+            <i class="fa-solid fa-chevron-down text-xs group-open:rotate-180 transition-transform"></i>
+          </summary>
+          <p class="text-xs text-textDark/80 pt-3 leading-relaxed">Pricing varies depending on project scope, number of pages, and custom features needed. After submitting the questionnaire, we provide a transparent, itemized quote.</p>
+        </details>
+
+        <details class="clay-surface p-5 text-accentDark cursor-pointer group">
+          <summary class="font-bold text-sm flex justify-between items-center">
+            <span>What is the standard project timeline?</span>
+            <i class="fa-solid fa-chevron-down text-xs group-open:rotate-180 transition-transform"></i>
+          </summary>
+          <p class="text-xs text-textDark/80 pt-3 leading-relaxed">A standard landing page or 5-page site takes about 1 to 2 weeks once all content is provided. Larger custom web apps take 3 to 6 weeks.</p>
+        </details>
+
+        <details class="clay-surface p-5 text-accentDark cursor-pointer group">
+          <summary class="font-bold text-sm flex justify-between items-center">
+            <span>Do you handle website hosting & domain setup?</span>
+            <i class="fa-solid fa-chevron-down text-xs group-open:rotate-180 transition-transform"></i>
+          </summary>
+          <p class="text-xs text-textDark/80 pt-3 leading-relaxed">Yes! We can deploy your site on platforms like GitHub Pages, Netlify, or Vercel for free hosting, or configure custom domain hosting seamlessly.</p>
+        </details>
+
+        <details class="clay-surface p-5 text-accentDark cursor-pointer group">
+          <summary class="font-bold text-sm flex justify-between items-center">
+            <span>What do I need to provide before starting?</span>
+            <i class="fa-solid fa-chevron-down text-xs group-open:rotate-180 transition-transform"></i>
+          </summary>
+          <p class="text-xs text-textDark/80 pt-3 leading-relaxed">Your brand logo, text copy, images/videos, and any preferred color schemes. If you don't have text or graphics, we can help create them!</p>
+        </details>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="mt-16 text-center text-clayBase/60 text-xs font-bold space-y-2">
+      <p>© 2026 bunnyMe9. Crafted by Sanheeth Singh.</p>
+    </footer>
+
+  </div>
+
+  <script>
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyQjmLojrL9UTYpltilf6__WQnpXQeEk_mHrY1XGh7f2jAjqu_TkwhG6-OkpyuN7qRp8g/exec";
+    let currentStep = 1;
+    let toastTimeoutId = null;
+
+    function showToast(message, type = 'info') {
+      const toast = document.getElementById('toast-notification');
+      const toastMsg = document.getElementById('toast-message');
+      const toastIcon = document.getElementById('toast-icon');
+      if (!toast || !toastMsg || !toastIcon) return;
+
+      toastMsg.textContent = message;
+      const iconClass = type === 'error' ? 'fa-triangle-exclamation text-red-500' : 'fa-circle-info text-accentYellow';
+      toastIcon.innerHTML = `<i class="fa-solid ${iconClass}"></i>`;
+      toast.classList.add('show');
+
+      if (toastTimeoutId) clearTimeout(toastTimeoutId);
+      toastTimeoutId = setTimeout(hideToast, 5000);
+    }
+
+    function hideToast() {
+      const toast = document.getElementById('toast-notification');
+      if (toast) toast.classList.remove('show');
+    }
+
+    function validateStep(step) {
+      const panel = document.getElementById(`step-${step}`);
+      if (!panel) return false;
+      const fields = Array.from(panel.querySelectorAll('input, select, textarea'));
+      for (const field of fields) {
+        if (!field.checkValidity()) {
+          field.reportValidity();
+          return false;
+        }
+      }
+      return true;
+    }
+
+    function goToStep(step) {
+      if (step > currentStep && !validateStep(currentStep)) {
+        showToast(`Please complete the required fields in Step ${currentStep}.`, 'error');
+        return;
+      }
+
+      document.querySelectorAll('.form-step').forEach(el => el.classList.remove('active'));
+      document.getElementById(`step-${step}`).classList.add('active');
+      currentStep = step;
+
+      const progressFill = document.getElementById('progress-bar-fill');
+      const stepText = document.getElementById('progress-text-step');
+      const stepTitle = document.getElementById('progress-text-title');
+      
+      const stepInfo = {
+        1: ['33.33%', 'STEP 1 OF 3', 'BASIC DETAILS & PROJECT TYPE'],
+        2: ['66.66%', 'STEP 2 OF 3', 'FEATURES & SCOPE'],
+        3: ['100%', 'STEP 3 OF 3', 'DESIGN STYLE & BUDGET']
+      }[step];
+
+      progressFill.style.width = stepInfo[0];
+      stepText.textContent = stepInfo[1];
+      stepTitle.textContent = stepInfo[2];
+    }
+
+    async function handleFormSubmit(e) {
+      e.preventDefault();
+      if (!validateStep(3)) return;
+
+      if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL === 'YOUR_WEB_APP_URL_HERE') {
+        showToast('Please attach your Google Apps Script URL in the script tag.', 'error');
+        return;
+      }
+
+      const submitBtn = document.getElementById('submitBtn');
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span>Sending...</span>';
+
+      const payload = {
+        clientName: document.getElementById('clientName').value,
+        contactPerson: document.getElementById('contactPerson').value,
+        contactDetails: document.getElementById('contactDetails').value,
+        projectType: document.getElementById('projectType').value,
+        pageCount: document.getElementById('pageCount').value,
+        requiredFeatures: document.getElementById('requiredFeatures').value,
+        contentReady: document.getElementById('contentReady').value,
+        designPreferences: document.getElementById('designPreferences').value,
+        referenceSites: document.getElementById('referenceSites').value,
+        budgetRange: document.getElementById('budgetRange').value
+      };
+
+      try {
+        await fetch(GOOGLE_SCRIPT_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          body: new URLSearchParams(payload)
+        });
+        document.getElementById('generalProjectForm').reset();
+        showToast('Thank you! Your requirements were submitted successfully.', 'info');
+      } catch (err) {
+        showToast('Failed to submit. Please check your internet connection.', 'error');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i><span>Submit Questionnaire</span>';
+      }
+    }
+  </script>
+</body>
+</html>
+
+```
